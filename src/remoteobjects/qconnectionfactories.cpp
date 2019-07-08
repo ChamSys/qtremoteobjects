@@ -99,7 +99,7 @@ inline bool fromDataStream(QDataStream &in, QRemoteObjectPacketTypeEnum &type, Q
 IoDeviceBase::IoDeviceBase(QObject *parent)
     : QObject(parent), m_isClosing(false), m_curReadSize(0)
 {
-    m_dataStream.setVersion(dataStreamVersion);
+    m_dataStream.setVersion(dataStreamVersion(ProtocolVersion::Latest));
 }
 
 IoDeviceBase::~IoDeviceBase()

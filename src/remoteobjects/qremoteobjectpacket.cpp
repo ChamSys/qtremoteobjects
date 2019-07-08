@@ -361,7 +361,7 @@ void QDataStreamCodec::serializeProperty(QDataStream &ds, const QRemoteObjectSou
 void QDataStreamCodec::serializeHandshakePacket()
 {
     m_packet.setId(Handshake);
-    m_packet << QString(protocolVersion);
+    m_packet << QString(protocolVersionString(m_packet.protocolVersion()));
     m_packet.finishPacket();
 }
 
@@ -1131,7 +1131,7 @@ QDataStream &operator>>(QDataStream &stream, QAS_ &map)
 DataStreamPacket::DataStreamPacket(quint16 id)
     : QDataStream(&array, QIODevice::WriteOnly), baseAddress(0), size(0)
 {
-    this->setVersion(QtRemoteObjects::dataStreamVersion);
+    this->setVersion(QtRemoteObjects::dataStreamVersion(QtRemoteObjects::ProtocolVersion::Latest));
     this->setByteOrder(QDataStream::LittleEndian);
     *this << quint32(0);
     *this << id;

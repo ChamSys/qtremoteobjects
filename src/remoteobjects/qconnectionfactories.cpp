@@ -389,7 +389,7 @@ QtROClientFactory *QtROClientFactory::instance()
 
 QtROIoDeviceBasePrivate::QtROIoDeviceBasePrivate() : QObjectPrivate()
 {
-    m_dataStream.setVersion(dataStreamVersion);
+    m_dataStream.setVersion(dataStreamVersion(ProtocolVersion::Latest));
     m_dataStream.setByteOrder(QDataStream::LittleEndian);
 }
 

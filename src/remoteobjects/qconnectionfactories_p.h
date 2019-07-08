@@ -64,8 +64,42 @@ QT_BEGIN_NAMESPACE
 
 namespace QtRemoteObjects {
 
-static const int dataStreamVersion = QDataStream::Qt_6_2;
-static const QLatin1String protocolVersion("QtRO 2.0");
+enum class ProtocolVersion {
+  QtRO1_1, // Qt 5.11
+           // There was a QtRO1_2 in a released Qt version
+  QtRO1_3, // Qt.5.12.4
+  QtRO2_0, // Qt 6.3
+
+  Latest = QtRO2_0
+};
+
+constexpr QLatin1String protocolVersionString(const ProtocolVersion v)
+{
+  switch (v) {
+    case ProtocolVersion::QtRO1_1:
+      return QLatin1String("QtRO 1.1");
+    case ProtocolVersion::QtRO1_3:
+      return QLatin1String("QtRO 1.3");
+    case ProtocolVersion::QtRO2_0:
+      return QLatin1String("QtRO 2.0");
+  }
+
+  return protocolVersionString(ProtocolVersion::Latest);
+}
+
+constexpr QDataStream::Version dataStreamVersion(const ProtocolVersion v)
+{
+  switch (v) {
+    case ProtocolVersion::QtRO1_1:
+      return QDataStream::Qt_5_11;
+    case ProtocolVersion::QtRO1_3:
+      return QDataStream::Qt_5_12;
+    case ProtocolVersion::QtRO2_0:
+      return QDataStream::Qt_6_2;
+  }
+
+  return dataStreamVersion(ProtocolVersion::Latest);
+}
 
 }
 

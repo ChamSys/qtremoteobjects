@@ -73,6 +73,10 @@ class QMetaObjectBuilder;
 class QRemoteObjectSourceBase;
 class QRemoteObjectRootSource;
 
+namespace QtRemoteObjects {
+enum class ProtocolVersion;
+}
+
 namespace QRemoteObjectPackets {
 
 Q_NAMESPACE
@@ -220,10 +224,13 @@ public:
         array.clear();
     }
 
+    QtRemoteObjects::ProtocolVersion protocolVersion() const { return m_protocolVersion; }
+
 private:
     QByteArray array;
     int baseAddress;
     int size;
+    QtRemoteObjects::ProtocolVersion m_protocolVersion;
 
     Q_DISABLE_COPY(DataStreamPacket)
 };

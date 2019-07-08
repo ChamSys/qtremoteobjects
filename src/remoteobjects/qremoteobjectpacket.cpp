@@ -163,7 +163,7 @@ void serializeProperty(QDataStream &ds, const QRemoteObjectSourceBase *source, i
 void serializeHandshakePacket(DataStreamPacket &ds)
 {
     ds.setId(Handshake);
-    ds << QString(protocolVersion);
+    ds << QString(protocolVersionString(ds.protocolVersion));
     ds.finishPacket();
 }
 

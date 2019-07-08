@@ -143,7 +143,7 @@ public:
         , baseAddress(0)
         , size(0)
     {
-        this->setVersion(QtRemoteObjects::dataStreamVersion);
+        this->setVersion(QtRemoteObjects::dataStreamVersion(QtRemoteObjects::ProtocolVersion::Latest));
         *this << quint32(0);
         *this << id;
     }

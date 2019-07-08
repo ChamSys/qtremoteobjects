@@ -1257,8 +1257,9 @@ void QRemoteObjectNodePrivate::onClientRead(QObject *obj)
             break;
         }
         case Handshake:
-            if (rxName != QtRemoteObjects::protocolVersion) {
-                qWarning() << "*** Protocol Mismatch, closing connection ***. Got" << rxName << "expected" << QtRemoteObjects::protocolVersion;
+            if (rxName != QtRemoteObjects::protocolVersionString(ProtocolVersion::Latest)) {
+                qWarning() << "*** Protocol Mismatch, closing connection ***. Got" << rxName
+                           << "expected" << QtRemoteObjects::protocolVersionString(ProtocolVersion::Latest);
                 setLastError(QRemoteObjectNode::ProtocolMismatch);
                 connection->close();
             } else {

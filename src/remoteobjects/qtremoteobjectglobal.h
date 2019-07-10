@@ -184,6 +184,10 @@ Q_ENUM_NS(InitialAction)
 
 }
 
+// This signals that the backwards compatibility patches
+// have been applied
+#define QREMOTEOBJECTS_HAS_BACKWARDS_COMPAT
+
 QT_END_NAMESPACE
 
 #endif // QTREMOTEOBJECTSGLOBAL_H

@@ -831,13 +831,31 @@ static void registerAllGadgets(IoDeviceBase *connection, Gadgets &gadgets)
         registerGadgets(connection, gadgets, gadgets.constBegin().key());
 }
 
-static void deserializeEnum(QDataStream &ds, EnumData &enumData)
+static void deserializeEnum(QDataStream &ds, EnumData &enumData, ProtocolVersion v)
 {
     ds >> enumData.name;
     ds >> enumData.isFlag;
-    ds >> enumData.isScoped;
-    ds >> enumData.size;
-    ds >> enumData.keyCount;
+
+    if (v == ProtocolVersion::QtRO1_1)
+    {
+      enumData.size = 4;  
+      {
+        QByteArray scopeName;
+        ds >> scopeName;
+      }
+      {
+        int i = 0;
+        ds >> i;
+        enumData.keyCount = i;
+      }
+    }
+    else
+    {
+      ds >> enumData.isScoped;
+      ds >> enumData.size;
+      ds >> enumData.keyCount;
+    }
+
     for (quint32 i = 0; i < enumData.keyCount; i++) {
         EnumPair pair;
         ds >> pair.name;
@@ -876,7 +894,7 @@ static void parseGadgets(IoDeviceBase *connection, QDataStream &in)
         auto &enums = gadgets[type].enums;
         for (quint32 e = 0; e < numEnums; ++e) {
             EnumData enumData;
-            deserializeEnum(in, enumData);
+            deserializeEnum(in, enumData, ProtocolVersion::QtRO1_3);
             enums.push_back(enumData);
         }
     }
@@ -905,7 +923,7 @@ QMetaObject *QRemoteObjectMetaObjectManager::addDynamicType(IoDeviceBase *connec
     QVector<quint32> enumSizes(numEnums);
     for (quint32 i = 0; i < numEnums; ++i) {
         EnumData enumData;
-        deserializeEnum(in, enumData);
+        deserializeEnum(in, enumData, connection->protocolVersion());
         auto enumBuilder = builder.addEnumerator(enumData.name);
         enumBuilder.setIsFlag(enumData.isFlag);
         enumBuilder.setIsScoped(enumData.isScoped);
@@ -916,7 +934,9 @@ QMetaObject *QRemoteObjectMetaObjectManager::addDynamicType(IoDeviceBase *connec
             enumBuilder.addKey(pair.name, pair.value);
         }
     }
-    parseGadgets(connection, in);
+
+    if (connection->protocolVersion() != ProtocolVersion::QtRO1_1)
+      parseGadgets(connection, in);
 
     int curIndex = 0;
 
@@ -1257,13 +1277,17 @@ void QRemoteObjectNodePrivate::onClientRead(QObject *obj)
             break;
         }
         case Handshake:
-            if (rxName != QtRemoteObjects::protocolVersionString(ProtocolVersion::Latest)) {
+            if (rxName == QtRemoteObjects::protocolVersionString(ProtocolVersion::QtRO1_1)) {
+                connection->setProtocolVersion(ProtocolVersion::QtRO1_1);
+                m_handshakeReceived = true;
+            } else if (rxName == QtRemoteObjects::protocolVersionString(ProtocolVersion::QtRO1_3)) {
+                connection->setProtocolVersion(ProtocolVersion::QtRO1_3);
+                m_handshakeReceived = true;
+            } else {
                 qWarning() << "*** Protocol Mismatch, closing connection ***. Got" << rxName
                            << "expected" << QtRemoteObjects::protocolVersionString(ProtocolVersion::Latest);
                 setLastError(QRemoteObjectNode::ProtocolMismatch);
                 connection->close();
-            } else {
-                m_handshakeReceived = true;
             }
             break;
         case ObjectList:

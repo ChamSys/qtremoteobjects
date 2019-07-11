@@ -138,12 +138,13 @@ void deserializeObjectListPacket(QDataStream&, ObjectInfoList&);
 class DataStreamPacket : public QDataStream
 {
 public:
-    DataStreamPacket(quint16 id = QtRemoteObjects::InvokePacket)
+    DataStreamPacket(QtRemoteObjects::ProtocolVersion v = QtRemoteObjects::ProtocolVersion::Latest,
+                     quint16 id = QtRemoteObjects::InvokePacket)
         : QDataStream(&array, QIODevice::WriteOnly)
         , baseAddress(0)
         , size(0)
     {
-        this->setVersion(QtRemoteObjects::dataStreamVersion(QtRemoteObjects::ProtocolVersion::Latest));
+        setProtocolVersion(v);
         *this << quint32(0);
         *this << id;
     }
@@ -160,9 +161,16 @@ public:
         device()->seek(baseAddress);
         *this << quint32(size - baseAddress - sizeof(quint32));
     }
+
+    void setProtocolVersion(const QtRemoteObjects::ProtocolVersion v)
+    {
+      protocolVersion = v;
+      this->setVersion(QtRemoteObjects::dataStreamVersion(protocolVersion));
+    }
     QByteArray array;
     int baseAddress;
     int size;
+    QtRemoteObjects::ProtocolVersion protocolVersion;
 
 private:
     Q_DISABLE_COPY(DataStreamPacket)

@@ -119,6 +119,9 @@ public:
     void removeSource(const QString &);
     QSet<QString> remoteObjects() const;
 
+    QtRemoteObjects::ProtocolVersion protocolVersion() const { return m_protocolVersion; }
+    void setProtocolVersion(const QtRemoteObjects::ProtocolVersion v);
+
 Q_SIGNALS:
     void readyRead();
     void disconnected();
@@ -132,6 +135,7 @@ private:
     quint32 m_curReadSize;
     QDataStream m_dataStream;
     QSet<QString> m_remoteObjects;
+    QtRemoteObjects::ProtocolVersion m_protocolVersion = QtRemoteObjects::ProtocolVersion::Latest;
 };
 
 class Q_REMOTEOBJECTS_EXPORT ServerIoDevice : public IoDeviceBase

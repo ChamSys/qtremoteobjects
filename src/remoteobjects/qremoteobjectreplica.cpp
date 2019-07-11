@@ -471,6 +471,7 @@ void QConnectedReplicaImplementation::setConnection(IoDeviceBase *conn)
     if (connectionToSource.isNull()) {
         connectionToSource = conn;
         qCDebug(QT_REMOTEOBJECT) << "setConnection started" << conn << m_objectName;
+        m_packet.setProtocolVersion(conn->protocolVersion());
     }
     requestRemoteObjectSource();
 }

@@ -153,6 +153,7 @@ void IoDeviceBase::initializeDataStream()
 {
     m_dataStream.setDevice(connection());
     m_dataStream.resetStatus();
+    m_dataStream.setVersion(dataStreamVersion(m_protocolVersion));
 }
 
 void IoDeviceBase::addSource(const QString &name)
@@ -168,6 +169,12 @@ void IoDeviceBase::removeSource(const QString &name)
 QSet<QString> IoDeviceBase::remoteObjects() const
 {
     return m_remoteObjects;
+}
+
+void IoDeviceBase::setProtocolVersion(const QtRemoteObjects::ProtocolVersion v)
+{
+  m_protocolVersion = v;
+  m_dataStream.setVersion(dataStreamVersion(m_protocolVersion));
 }
 
 ClientIoDevice::ClientIoDevice(QObject *parent) : IoDeviceBase(parent)
